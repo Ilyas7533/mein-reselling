@@ -11,8 +11,11 @@ const ZIEL_HELLIGKEIT = 150; // mittlere Helligkeit (0–255), auf die „Automa
 
 // Jedes Foto: { id, quelle (Canvas mit dem Original), auto (Werte fürs automatische Aufhellen), px, py (Ausschnitt 0–1), leinwand (Vorschau) }
 let fotos = [];
-let format = 1; // Breite geteilt durch Höhe
-const einstellung = { hell: 0, kontrast: 0, farbe: 0, waerme: 0, auto: true };
+let format = 0.8; // Breite geteilt durch Höhe – 4:5, so zeigt Vinted die Fotos an
+// Die feste „Vinted-Einstellung“: aufgehellt, etwas mehr Kontrast und Farbe, minimal wärmer.
+// Damit wirkt Kleidung frisch, ohne unnatürlich auszusehen. Hier ändern, wenn sie dir nicht gefällt.
+const VINTED = { hell: 0, kontrast: 8, farbe: 6, waerme: 3 };
+const einstellung = { ...VINTED, auto: true };
 let zeigeOriginal = false;
 
 const begrenzen = (x, min, max) => Math.min(max, Math.max(min, x));
@@ -247,12 +250,20 @@ for (const [name, sel] of Object.entries(regler)) {
   });
 }
 $("#auto").addEventListener("change", (e) => { einstellung.auto = e.target.checked; alleZeichnen(); });
-$("#zuruecksetzen").addEventListener("click", () => {
+
+// Regler und Schalter auf die Vinted-Einstellung stellen (beim Start und mit dem Knopf)
+function vintedEinstellung() {
   for (const [name, sel] of Object.entries(regler)) {
-    einstellung[name] = 0;
-    $(sel).value = 0;
-    $(anzeige[name]).textContent = "0";
+    einstellung[name] = VINTED[name];
+    $(sel).value = VINTED[name];
+    $(anzeige[name]).textContent = (VINTED[name] > 0 ? "+" : "") + VINTED[name];
   }
+  einstellung.auto = true;
+  $("#auto").checked = true;
+}
+$("#zuruecksetzen").addEventListener("click", () => {
+  vintedEinstellung();
+  setzeFormat(formatKnoepfe[0]);
   alleZeichnen();
 });
 $("#vorher").addEventListener("click", (e) => {
@@ -308,5 +319,6 @@ function meldung(text) {
   meldungZeit = setTimeout(() => t.classList.remove("zeigen"), 2400);
 }
 
-setzeFormat(formatKnoepfe[0]);
+vintedEinstellung();
+setzeFormat(formatKnoepfe[0]); // der erste Knopf ist „Vinted 4:5“
 aufbauen();

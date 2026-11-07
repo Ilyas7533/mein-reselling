@@ -15,9 +15,21 @@
 .ablage-feld span:last-child { color: var(--leise); font-weight: 400; font-size: 14.5px; }
 .ablage-liste { margin: 0; padding: 0 0 0 20px; color: var(--leise); font-size: 14.5px; display: grid; gap: 4px; }
 
-/* Werkbank: links Regler, rechts Fotos */
-.werkbank:not([hidden]) { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; margin-top: 24px; }
-.regler-feld { position: sticky; top: 84px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund); padding: 18px; display: grid; gap: 18px; }
+/* Werkbank: oben die Vinted-Einstellung, darunter die Fotos */
+.werkbank:not([hidden]) { display: grid; gap: 14px; margin-top: 24px; }
+.vinted-kopf { display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border-radius: var(--rund); background: #12241C; border: 1px solid #1F4A37; }
+.vinted-kopf strong { color: var(--plus); font-size: 16px; }
+.vinted-kopf p { margin: 2px 0 0; color: #B9D9C9; font-size: 14px; }
+.vinted-haken { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--plus); position: relative; margin-top: 1px; }
+.vinted-haken::after { content: ""; position: absolute; left: 9px; top: 5px; width: 6px; height: 11px; border: solid #0E1113; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+.fein { background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund); }
+.fein summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: 14.5px; color: var(--leise); list-style-position: inside; }
+.fein summary small { font-weight: 400; color: var(--gedeckt); }
+.fein[open] summary { color: var(--tinte); border-bottom: 1px solid var(--linie); }
+.regler-feld { padding: 16px; display: grid; gap: 18px; grid-template-columns: 1fr 1fr; align-items: start; }
+.regler-feld .gruppe, .regler-feld .schalter { grid-column: 1; }
+.regler-feld .regler { grid-column: 2; grid-row: 1 / span 3; }
+.regler-feld .regler-knoepfe { grid-column: 1; }
 .gruppe { display: grid; gap: 8px; }
 .gruppe-name { font-weight: 600; font-size: 14.5px; }
 .formate { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -41,14 +53,15 @@
 .bild-knoepfe { display: flex; gap: 6px; }
 .bild-knoepfe .knopf { flex: 1; }
 .bild-knoepfe .knopf-rot { flex: none; width: 36px; padding: 0; }
-.speichern-leiste { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.speichern-leiste { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; padding: 10px; background: rgba(14, 17, 19, .94); backdrop-filter: blur(10px); border: 1px solid var(--linie); border-radius: var(--rund); }
+#alle-speichern { min-width: 200px; }
 
 @media (max-width: 760px) {
-  .werkbank:not([hidden]) { grid-template-columns: 1fr; }
-  .regler-feld { position: static; }
+  .regler-feld { grid-template-columns: 1fr; }
+  .regler-feld .gruppe, .regler-feld .schalter, .regler-feld .regler, .regler-feld .regler-knoepfe { grid-column: 1; grid-row: auto; }
   .bilder { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .bild { padding: 6px; }
-  .speichern-leiste { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); background: rgba(14, 17, 19, .94); backdrop-filter: blur(10px); padding: 10px; border: 1px solid var(--linie); border-radius: var(--rund); }
   .speichern-leiste .knopf { flex: 1; }
+  #alle-speichern { flex-basis: 100%; min-width: 0; min-height: 48px; font-size: 16px; }
   .studio .fuss { padding-bottom: 24px; }
 }

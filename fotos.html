@@ -34,20 +34,30 @@
         <span>oder hierher ziehen · am Handy auch mit der Kamera</span>
       </label>
       <ul class="ablage-liste">
-        <li>Alle Fotos bekommen dasselbe Format.</li>
-        <li>Jedes Foto wird automatisch gleich hell gemacht.</li>
+        <li>Fotos auswählen, speichern – fertig. Die Vinted-Einstellung macht den Rest.</li>
+        <li>Alle Fotos werden ins Vinted-Format 4:5 gebracht und gleich hell gemacht.</li>
         <li>Deine Fotos bleiben auf deinem Gerät, nichts wird hochgeladen.</li>
       </ul>
     </section>
 
     <!-- Bearbeiten -->
     <section class="werkbank" id="werkbank" hidden>
+      <div class="vinted-kopf">
+        <span class="vinted-haken" aria-hidden="true"></span>
+        <div>
+          <strong>Vinted-Einstellung ist aktiv</strong>
+          <p>Hochformat 4:5, automatisch aufgehellt, etwas mehr Kontrast und Farbe. Du musst nichts einstellen – einfach unten speichern.</p>
+        </div>
+      </div>
+
+      <details class="fein">
+        <summary>Feineinstellungen <small>(musst du nicht ändern)</small></summary>
       <div class="regler-feld">
         <div class="gruppe">
           <span class="gruppe-name" id="format-name">Format</span>
           <div class="formate" role="radiogroup" aria-labelledby="format-name">
-            <button type="button" role="radio" aria-checked="true" data-format="1">Quadrat 1:1</button>
-            <button type="button" role="radio" aria-checked="false" data-format="0.8">Hoch 4:5</button>
+            <button type="button" role="radio" aria-checked="true" data-format="0.8">Vinted 4:5</button>
+            <button type="button" role="radio" aria-checked="false" data-format="1">Quadrat 1:1</button>
             <button type="button" role="radio" aria-checked="false" data-format="0.75">Hoch 3:4</button>
           </div>
         </div>
@@ -69,13 +79,14 @@
         </div>
 
         <div class="regler-knoepfe">
-          <button class="knopf knopf-klein" type="button" id="zuruecksetzen">Regler zurücksetzen</button>
+          <button class="knopf knopf-klein" type="button" id="zuruecksetzen">Zurück zur Vinted-Einstellung</button>
           <button class="knopf knopf-klein" type="button" id="vorher" aria-pressed="false">Original zeigen</button>
         </div>
       </div>
+      </details>
 
       <div class="ergebnis-feld">
-        <p class="tipp">Ausschnitt verschieben: Foto mit dem Finger oder der Maus ziehen.</p>
+        <p class="tipp">Tipp: Ist etwas abgeschnitten, das Foto mit dem Finger verschieben.</p>
         <ul class="bilder" id="bilder"></ul>
         <div class="speichern-leiste">
           <button class="knopf knopf-hell" type="button" id="alle-speichern">Alle speichern</button>
