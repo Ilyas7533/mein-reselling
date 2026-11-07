@@ -119,11 +119,6 @@ function tageSeit(datum) {
   jetzt.setHours(0, 0, 0, 0);
   return Math.max(0, Math.round((jetzt - start) / 86400000));
 }
-function datumLesbar(datum) {
-  if (!datum) return "";
-  const [j, m, t] = datum.split("-");
-  return `${t}.${m}.${j}`;
-}
 const monatVon = (datum) => (datum || "").slice(0, 7);
 const monatName = (ym) => {
   const [j, m] = ym.split("-").map(Number);
@@ -242,7 +237,7 @@ function zeichneVerkauft() {
       fotoKachel(a),
       el("div", { class: "text" },
         el("h3", { text: a.name }),
-        el("div", { class: "info", text: `${datumLesbar(a.verkaufsdatum)} · gekauft für ${euro(kostenVon(a))}${a.versand ? ` · Versand ${euro(a.versand)}` : ""}` }),
+        el("div", { class: "info", text: `gekauft für ${euro(kostenVon(a))}${a.versand ? ` · Versand ${euro(a.versand)}` : ""}` }),
       ),
       el("div", { class: "preis" }, euro(a.verkauf), el("small", { class: g < 0 ? "minus" : "plus", text: `${g >= 0 ? "+" : ""}${euro(g)} Gewinn` })),
       el("div", { class: "aktionen" },
@@ -299,7 +294,6 @@ async function oeffneArtikel(id = null) {
   f.groesse.value = a?.groesse ?? "";
   f.einkauf.value = a ? zuText(a.einkauf) : "";
   f.kosten.value = a?.kosten ? zuText(a.kosten) : "";
-  f.kaufdatum.value = a?.kaufdatum ?? heute();
   f.notiz.value = a?.notiz ?? "";
   fArtikel.showModal();
   f.name.focus();
@@ -325,13 +319,13 @@ formArtikel.addEventListener("submit", async (e) => {
     groesse: f.groesse.value.trim(),
     einkauf,
     kosten: kosten || 0,
-    kaufdatum: f.kaufdatum.value || heute(),
     notiz: f.notiz.value.trim(),
   };
   let ziel = artikel.find((x) => x.id === bearbeitenId);
   const warDa = Boolean(ziel);
   if (ziel) Object.assign(ziel, werte);
-  else artikel.push(ziel = { id: neueId(), status: "lager", ...werte });
+  // Das Datum wird nicht angezeigt, aber gemerkt (für „seit … Tagen“ und die Sortierung)
+  else artikel.push(ziel = { id: neueId(), status: "lager", kaufdatum: heute(), ...werte });
 
   // Foto speichern oder entfernen
   try {
@@ -382,7 +376,6 @@ function oeffneVerkauf(id) {
   $("#verkauf-name").textContent = `${a.name} · gekauft für ${euro(kostenVon(a))}`;
   f.verkauf.value = a.status === "verkauft" ? zuText(a.verkauf) : "";
   f.versand.value = a.versand ? zuText(a.versand) : "";
-  f.verkaufsdatum.value = a.verkaufsdatum ?? heute();
   $("#zurueck-lager").hidden = a.status !== "verkauft";
   zeigeGewinnVorschau();
   fVerkauf.showModal();
@@ -416,7 +409,8 @@ formVerkauf.addEventListener("submit", (e) => {
     return;
   }
   const a = artikel.find((x) => x.id === verkaufId);
-  Object.assign(a, { status: "verkauft", verkauf, versand: versand || 0, verkaufsdatum: f.verkaufsdatum.value || heute() });
+  // Verkaufsdatum wird automatisch gemerkt (für „Gewinn diesen Monat“); beim Bearbeiten bleibt das alte
+  Object.assign(a, { status: "verkauft", verkauf, versand: versand || 0, verkaufsdatum: a.verkaufsdatum ?? heute() });
   speichern();
   fVerkauf.close();
   zeichnen();

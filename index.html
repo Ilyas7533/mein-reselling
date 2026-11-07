@@ -144,13 +144,10 @@
         <label>Einkaufspreis *
           <span class="euro"><input name="einkauf" required inputmode="decimal" placeholder="0,00"></span>
         </label>
-        <label>Gekauft am
-          <input name="kaufdatum" type="date">
+        <label>Sonstige Kosten <small>(Reinigung …)</small>
+          <span class="euro"><input name="kosten" inputmode="decimal" placeholder="0,00"></span>
         </label>
       </div>
-      <label>Sonstige Kosten <small>(Reinigung, Verpackung …)</small>
-        <span class="euro"><input name="kosten" inputmode="decimal" placeholder="0,00"></span>
-      </label>
       <label>Notiz
         <textarea name="notiz" rows="2" maxlength="300"></textarea>
       </label>
@@ -173,13 +170,10 @@
         <label>Verkaufspreis *
           <span class="euro"><input name="verkauf" required inputmode="decimal" placeholder="0,00"></span>
         </label>
-        <label>Verkauft am
-          <input name="verkaufsdatum" type="date">
+        <label>Deine Versandkosten <small>(meist 0)</small>
+          <span class="euro"><input name="versand" inputmode="decimal" placeholder="0,00"></span>
         </label>
       </div>
-      <label>Deine Versandkosten <small>(meist 0 – zahlt der Käufer)</small>
-        <span class="euro"><input name="versand" inputmode="decimal" placeholder="0,00"></span>
-      </label>
       <p class="vorschau" id="verkauf-gewinn" aria-live="polite"></p>
       <p class="fehler" id="fehler-verkauf" role="alert" hidden></p>
       <div class="fenster-knoepfe">
