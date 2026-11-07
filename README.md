@@ -14,7 +14,7 @@ Kleine App für Vinted-Reselling: Lager, Verkäufe, Gewinn und ein Preisrechner.
 
 ## Daten
 
-Alles wird im Browser auf diesem Gerät gespeichert (`localStorage`, Schlüssel `reselling-v1`). Wer die Browserdaten löscht, löscht auch die Artikel. Darum ab und zu **Daten sichern** – das lädt eine `.json`-Datei herunter, die man mit **Daten laden** wieder einspielen kann (auch auf einem anderen Gerät).
+Alles wird im Browser auf diesem Gerät gespeichert: die Artikel im `localStorage` (Schlüssel `reselling-v1`), die Fotos in der Browser-Datenbank IndexedDB (`reselling-fotos`, gespeichert unter der ID des Artikels). Fotos werden beim Hinzufügen auf höchstens 640 px verkleinert. Wer die Browserdaten löscht, löscht auch Artikel und Fotos. Darum ab und zu **Daten sichern** – das lädt eine `.json`-Datei mit allen Artikeln und Fotos herunter, die man mit **Daten laden** wieder einspielen kann (auch auf einem anderen Gerät).
 
 ## Aufbau
 

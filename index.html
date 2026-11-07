@@ -4,15 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Mein Reselling</title>
-  <meta name="theme-color" content="#123B33">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23123B33'/%3E%3Cpath d='M9 17l5 5 9-12' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0E1113">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171C1F'/%3E%3Cpath d='M9 17l5 5 9-12' stroke='%2346C08E' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="kopf">
     <div class="breite">
-      <h1>Mein Reselling</h1>
-      <button class="knopf knopf-voll" type="button" data-neu>+ Artikel</button>
+      <div class="marke-name">
+        <span class="logo" aria-hidden="true"></span>
+        <h1>Mein Reselling</h1>
+      </div>
+      <button class="knopf knopf-hell" type="button" data-neu>+ Artikel</button>
     </div>
   </header>
 
@@ -57,7 +61,7 @@
         </select>
       </div>
       <ul class="liste" id="liste-lager"></ul>
-      <p class="leer" id="leer-lager" hidden>Noch nichts im Lager. Tippe oben auf <b>+ Artikel</b>.</p>
+      <p class="leer" id="leer-lager" hidden></p>
     </section>
 
     <!-- Verkauft -->
@@ -102,7 +106,7 @@
   </main>
 
   <footer class="fuss breite">
-    <p>Deine Daten bleiben nur auf diesem Gerät, in diesem Browser.</p>
+    <p>Deine Daten und Fotos bleiben nur auf diesem Gerät, in diesem Browser.</p>
     <div class="fuss-knoepfe">
       <button class="knopf" type="button" id="sichern">Daten sichern</button>
       <label class="knopf" for="laden">Daten laden</label>
@@ -114,6 +118,17 @@
   <dialog class="fenster" id="f-artikel" aria-labelledby="f-artikel-titel">
     <form method="dialog" id="form-artikel" autocomplete="off">
       <h2 id="f-artikel-titel">Neuer Artikel</h2>
+
+      <div class="foto-feld">
+        <div class="foto-vorschau" id="foto-vorschau" aria-hidden="true"><span>Kein Foto</span></div>
+        <div class="foto-knoepfe">
+          <label class="knopf knopf-klein" for="foto-datei" id="foto-waehlen">Foto hinzufügen</label>
+          <input type="file" id="foto-datei" accept="image/*" hidden>
+          <button class="knopf knopf-klein knopf-leise" type="button" id="foto-entfernen" hidden>Foto entfernen</button>
+          <small>Am Handy kannst du direkt die Kamera nehmen.</small>
+        </div>
+      </div>
+
       <label>Was ist es? *
         <input name="name" required maxlength="80" placeholder="z. B. Nike Hoodie grau">
       </label>
@@ -144,7 +159,7 @@
         <button class="knopf knopf-rot" type="button" id="loeschen" hidden>Löschen</button>
         <span class="platz"></span>
         <button class="knopf" type="button" data-schliessen>Abbrechen</button>
-        <button class="knopf knopf-voll" type="submit" value="ok">Speichern</button>
+        <button class="knopf knopf-hell" type="submit" value="ok">Speichern</button>
       </div>
     </form>
   </dialog>
@@ -171,7 +186,7 @@
         <button class="knopf" type="button" id="zurueck-lager" hidden>Zurück ins Lager</button>
         <span class="platz"></span>
         <button class="knopf" type="button" data-schliessen>Abbrechen</button>
-        <button class="knopf knopf-voll" type="submit" value="ok">Speichern</button>
+        <button class="knopf knopf-hell" type="submit" value="ok">Speichern</button>
       </div>
     </form>
   </dialog>

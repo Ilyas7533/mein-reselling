@@ -26,6 +26,71 @@ function speichern() {
   }
 }
 
+// ---------- Fotos ----------
+// Fotos sind zu groß für den localStorage. Sie liegen deshalb in der Browser-Datenbank
+// (IndexedDB), gespeichert unter der ID des Artikels.
+let dbVersprechen;
+function datenbank() {
+  dbVersprechen ??= new Promise((ok, nein) => {
+    const anfrage = indexedDB.open("reselling-fotos", 1);
+    anfrage.onupgradeneeded = () => anfrage.result.createObjectStore("fotos");
+    anfrage.onsuccess = () => ok(anfrage.result);
+    anfrage.onerror = () => nein(anfrage.error);
+  });
+  return dbVersprechen;
+}
+async function fotoAktion(modus, aktion) {
+  const db = await datenbank();
+  return new Promise((ok, nein) => {
+    const tx = db.transaction("fotos", modus);
+    const anfrage = aktion(tx.objectStore("fotos"));
+    tx.oncomplete = () => ok(anfrage?.result);
+    tx.onerror = () => nein(tx.error);
+  });
+}
+const fotoSpeichern = (id, blob) => fotoAktion("readwrite", (s) => s.put(blob, id));
+const fotoLaden = (id) => fotoAktion("readonly", (s) => s.get(id));
+const fotoLoeschen = (id) => fotoAktion("readwrite", (s) => s.delete(id));
+const alleFotosLoeschen = () => fotoAktion("readwrite", (s) => s.clear());
+
+// Bereits geladene Fotos merken, damit die Liste nicht bei jedem Zeichnen neu lädt
+const fotoAdressen = new Map();
+async function fotoAdresse(id) {
+  if (!fotoAdressen.has(id)) {
+    const blob = await fotoLaden(id).catch(() => null);
+    fotoAdressen.set(id, blob ? URL.createObjectURL(blob) : null);
+  }
+  return fotoAdressen.get(id);
+}
+function fotoVergessen(id) {
+  const adresse = fotoAdressen.get(id);
+  if (adresse) URL.revokeObjectURL(adresse);
+  fotoAdressen.delete(id);
+}
+
+// Verkleinert ein Foto auf höchstens 640 px und speichert es als JPEG (ca. 40–80 KB)
+async function verkleinern(datei, max = 640) {
+  const bild = await createImageBitmap(datei, { imageOrientation: "from-image" });
+  const faktor = Math.min(1, max / Math.max(bild.width, bild.height));
+  const leinwand = document.createElement("canvas");
+  leinwand.width = Math.round(bild.width * faktor);
+  leinwand.height = Math.round(bild.height * faktor);
+  leinwand.getContext("2d").drawImage(bild, 0, 0, leinwand.width, leinwand.height);
+  bild.close?.();
+  return new Promise((ok) => leinwand.toBlob(ok, "image/jpeg", 0.82));
+}
+
+// Kleines Foto links in der Liste; ohne Foto der erste Buchstabe des Namens
+function fotoKachel(a) {
+  const kachel = el("div", { class: "foto" }, el("span", { text: (a.name || "?").trim().charAt(0).toUpperCase() }));
+  if (a.foto) {
+    fotoAdresse(a.id).then((adresse) => {
+      if (adresse) kachel.replaceChildren(el("img", { src: adresse, alt: "" }));
+    });
+  }
+  return kachel;
+}
+
 // ---------- Hilfen für Geld und Datum ----------
 const geldFormat = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
 const euro = (cent) => geldFormat.format((cent || 0) / 100);
@@ -122,27 +187,29 @@ function zeichneLager() {
   const ul = $("#liste-lager");
   ul.replaceChildren(...liste.map((a) => {
     const tage = tageSeit(a.kaufdatum);
-    const stufe = tage >= 60 ? " marke-sehr-alt" : tage >= 30 ? " marke-alt" : "";
+    const stufe = tage >= 60 ? " etikett-sehr-alt" : tage >= 30 ? " etikett-alt" : "";
     const details = [a.marke, a.groesse && `Größe ${a.groesse}`].filter(Boolean).join(" · ");
     return el("li", { class: "eintrag" },
-      el("div", {},
+      fotoKachel(a),
+      el("div", { class: "text" },
         el("h3", { text: a.name }),
         el("div", { class: "info" },
-          details ? `${details} · ` : "",
-          el("span", { class: `marke${stufe}`, text: tage === 0 ? "seit heute" : tage === 1 ? "seit 1 Tag" : `seit ${tage} Tagen` }),
+          details ? el("span", { text: details }) : null,
+          el("span", { class: `etikett${stufe}`, text: tage === 0 ? "seit heute" : tage === 1 ? "seit 1 Tag" : `seit ${tage} Tagen` }),
         ),
       ),
-      el("div", { class: "betrag", text: euro(kostenVon(a)) }),
+      el("div", { class: "preis" }, euro(kostenVon(a)), el("small", { text: "Einkauf" })),
       el("div", { class: "aktionen" },
-        el("button", { class: "knopf knopf-voll knopf-klein", type: "button", text: "Verkauft", onclick: () => oeffneVerkauf(a.id) }),
+        el("button", { class: "knopf knopf-hell knopf-klein", type: "button", text: "Verkauft", onclick: () => oeffneVerkauf(a.id) }),
         el("button", { class: "knopf knopf-klein", type: "button", text: "Preis berechnen", onclick: () => preisFuer(a) }),
         el("button", { class: "knopf knopf-klein", type: "button", text: "Bearbeiten", onclick: () => oeffneArtikel(a.id) }),
       ),
     );
   }));
-  $("#leer-lager").hidden = liste.length > 0;
-  if (!liste.length && suche) $("#leer-lager").textContent = "Nichts gefunden.";
-  else $("#leer-lager").innerHTML = "Noch nichts im Lager. Tippe oben auf <b>+ Artikel</b>.";
+  const leer = $("#leer-lager");
+  leer.hidden = liste.length > 0;
+  if (suche) leer.textContent = "Nichts gefunden.";
+  else leer.replaceChildren("Noch nichts im Lager. Tippe oben auf ", el("b", { text: "+ Artikel" }), ".");
 }
 
 function zeichneMonate() {
@@ -172,11 +239,12 @@ function zeichneVerkauft() {
   $("#liste-verkauft").replaceChildren(...liste.map((a) => {
     const g = gewinnVon(a);
     return el("li", { class: "eintrag" },
-      el("div", {},
+      fotoKachel(a),
+      el("div", { class: "text" },
         el("h3", { text: a.name }),
-        el("div", { class: "info", text: `${datumLesbar(a.verkaufsdatum)} · gekauft für ${euro(kostenVon(a))}, verkauft für ${euro(a.verkauf)}${a.versand ? `, Versand ${euro(a.versand)}` : ""}` }),
+        el("div", { class: "info", text: `${datumLesbar(a.verkaufsdatum)} · gekauft für ${euro(kostenVon(a))}${a.versand ? ` · Versand ${euro(a.versand)}` : ""}` }),
       ),
-      el("div", { class: `betrag ${g < 0 ? "minus" : "plus"}`, text: `${g >= 0 ? "+" : ""}${euro(g)}` }),
+      el("div", { class: "preis" }, euro(a.verkauf), el("small", { class: g < 0 ? "minus" : "plus", text: `${g >= 0 ? "+" : ""}${euro(g)} Gewinn` })),
       el("div", { class: "aktionen" },
         el("button", { class: "knopf knopf-klein", type: "button", text: "Bearbeiten", onclick: () => oeffneVerkauf(a.id) }),
       ),
@@ -188,12 +256,41 @@ function zeichneVerkauft() {
 // ---------- Fenster: Artikel ----------
 const fArtikel = $("#f-artikel");
 const formArtikel = $("#form-artikel");
+let neuesFoto; // undefined = unverändert, null = entfernt, Blob = neues Foto
+let vorschauAdresse = null;
 
-function oeffneArtikel(id = null) {
+function zeigeFotoVorschau(adresse) {
+  if (vorschauAdresse && vorschauAdresse !== adresse && !fotoAdressenWerte().includes(vorschauAdresse)) URL.revokeObjectURL(vorschauAdresse);
+  vorschauAdresse = adresse;
+  $("#foto-vorschau").replaceChildren(adresse ? el("img", { src: adresse, alt: "" }) : el("span", { text: "Kein Foto" }));
+  $("#foto-entfernen").hidden = !adresse;
+  $("#foto-waehlen").textContent = adresse ? "Foto ändern" : "Foto hinzufügen";
+}
+const fotoAdressenWerte = () => [...fotoAdressen.values()];
+
+$("#foto-datei").addEventListener("change", async (e) => {
+  const datei = e.target.files[0];
+  e.target.value = "";
+  if (!datei) return;
+  try {
+    neuesFoto = await verkleinern(datei);
+    zeigeFotoVorschau(URL.createObjectURL(neuesFoto));
+  } catch {
+    meldung("Dieses Foto kann nicht gelesen werden");
+  }
+});
+$("#foto-entfernen").addEventListener("click", () => {
+  neuesFoto = null;
+  zeigeFotoVorschau(null);
+});
+
+async function oeffneArtikel(id = null) {
   bearbeitenId = id;
+  neuesFoto = undefined;
   formArtikel.reset();
   $("#fehler-artikel").hidden = true;
   const a = artikel.find((x) => x.id === id);
+  zeigeFotoVorschau(a?.foto ? await fotoAdresse(a.id) : null);
   $("#f-artikel-titel").textContent = a ? "Artikel bearbeiten" : "Neuer Artikel";
   $("#loeschen").hidden = !a;
   const f = formArtikel.elements;
@@ -208,7 +305,7 @@ function oeffneArtikel(id = null) {
   f.name.focus();
 }
 
-formArtikel.addEventListener("submit", (e) => {
+formArtikel.addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = formArtikel.elements;
   const einkauf = zuCent(f.einkauf.value);
@@ -231,19 +328,39 @@ formArtikel.addEventListener("submit", (e) => {
     kaufdatum: f.kaufdatum.value || heute(),
     notiz: f.notiz.value.trim(),
   };
-  const vorhanden = artikel.find((x) => x.id === bearbeitenId);
-  if (vorhanden) Object.assign(vorhanden, werte);
-  else artikel.push({ id: neueId(), status: "lager", ...werte });
+  let ziel = artikel.find((x) => x.id === bearbeitenId);
+  const warDa = Boolean(ziel);
+  if (ziel) Object.assign(ziel, werte);
+  else artikel.push(ziel = { id: neueId(), status: "lager", ...werte });
+
+  // Foto speichern oder entfernen
+  try {
+    if (neuesFoto) {
+      await fotoSpeichern(ziel.id, neuesFoto);
+      fotoVergessen(ziel.id);
+      ziel.foto = true;
+    } else if (neuesFoto === null) {
+      await fotoLoeschen(ziel.id);
+      fotoVergessen(ziel.id);
+      delete ziel.foto;
+    }
+  } catch {
+    meldung("Das Foto konnte nicht gespeichert werden");
+  }
   speichern();
   fArtikel.close();
   zeichnen();
-  meldung(vorhanden ? "Gespeichert" : "Ins Lager gelegt");
+  meldung(warDa ? "Gespeichert" : "Ins Lager gelegt");
 });
 
-$("#loeschen").addEventListener("click", () => {
+$("#loeschen").addEventListener("click", async () => {
   const a = artikel.find((x) => x.id === bearbeitenId);
   if (!a || !confirm(`„${a.name}“ wirklich löschen?`)) return;
   artikel = artikel.filter((x) => x.id !== bearbeitenId);
+  if (a.foto) {
+    await fotoLoeschen(a.id).catch(() => {});
+    fotoVergessen(a.id);
+  }
   speichern();
   fArtikel.close();
   zeichnen();
@@ -377,8 +494,16 @@ function preisFuer(a) {
 }
 
 // ---------- Sichern und Laden ----------
-$("#sichern").addEventListener("click", () => {
-  const daten = JSON.stringify({ app: "mein-reselling", version: 1, gesichert: new Date().toISOString(), artikel }, null, 2);
+const alsText = (blob) => new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); });
+
+$("#sichern").addEventListener("click", async () => {
+  // Fotos kommen als Text (data:image/jpeg;base64,…) mit in die Sicherung
+  const mitFotos = await Promise.all(artikel.map(async (a) => {
+    if (!a.foto) return a;
+    const blob = await fotoLaden(a.id).catch(() => null);
+    return blob ? { ...a, fotoDaten: await alsText(blob) } : a;
+  }));
+  const daten = JSON.stringify({ app: "mein-reselling", version: 2, gesichert: new Date().toISOString(), artikel: mitFotos }, null, 2);
   const link = el("a", { href: URL.createObjectURL(new Blob([daten], { type: "application/json" })), download: `reselling-sicherung-${heute()}.json` });
   document.body.append(link);
   link.click();
@@ -396,6 +521,18 @@ $("#laden").addEventListener("change", async (e) => {
     const gueltig = Array.isArray(liste) && liste.every((a) => a && typeof a.name === "string" && Number.isInteger(a.einkauf) && (a.status === "lager" || a.status === "verkauft"));
     if (!gueltig) throw new Error("ungültig");
     if (!confirm(`${liste.length} Artikel laden? Deine aktuellen Daten werden dabei ersetzt.`)) return;
+    await alleFotosLoeschen().catch(() => {});
+    fotoAdressen.forEach((adresse) => adresse && URL.revokeObjectURL(adresse));
+    fotoAdressen.clear();
+    for (const a of liste) {
+      if (typeof a.fotoDaten === "string" && a.fotoDaten.startsWith("data:image/")) {
+        await fotoSpeichern(a.id, await (await fetch(a.fotoDaten)).blob());
+        a.foto = true;
+      } else {
+        delete a.foto;
+      }
+      delete a.fotoDaten;
+    }
     artikel = liste;
     speichern();
     zeichnen();
