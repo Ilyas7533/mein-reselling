@@ -38,6 +38,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .logo { width: 28px; height: 28px; border-radius: 8px; background: var(--flaeche-2); border: 1px solid var(--linie); position: relative; }
 .logo::after { content: ""; position: absolute; left: 9px; top: 5px; width: 7px; height: 13px; border: solid var(--plus); border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
 .kopf h1 { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: -.01em; }
+.kopf-knoepfe { display: flex; gap: 8px; }
 
 /* Knöpfe */
 .knopf {

@@ -11,6 +11,7 @@ Kleine App für Vinted-Reselling: Lager, Verkäufe, Gewinn und ein Preisrechner.
 - **Preis berechnen**: übernimmt den Einkaufspreis in den Preisrechner.
 - **Preisrechner**: Wunschgewinn und Mindestgewinn eingeben → Preis zum Ansetzen und die Grenze für Preisvorschläge (auf volle Euro aufgerundet).
 - Die Markierung „seit … Tagen“ wird ab 30 Tagen gelb und ab 60 Tagen rot.
+- **Foto-Studio** (`fotos.html`, oben rechts verlinkt): mehrere Fotos auswählen, alle bekommen dasselbe Format (1:1, 4:5 oder 3:4), werden automatisch gleich hell gemacht (Tonwerte strecken, dann aufhellen) und lassen sich mit Reglern für Helligkeit, Kontrast, Farbe und Wärme einheitlich anpassen. Ausschnitt per Ziehen verschieben, speichern als JPG (längste Seite 1600 px) oder am Handy über „Teilen“. Alles passiert im Browser, nichts wird hochgeladen.
 
 ## Daten
 

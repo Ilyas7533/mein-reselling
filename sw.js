@@ -1,7 +1,7 @@
 // Offline-Speicher: legt die App-Dateien im Handy ab, damit „Mein Reselling“ auch ohne Internet startet.
 // Bei jeder neuen Version die Nummer erhöhen, dann holt sich das Handy die neuen Dateien.
-const VERSION = "reselling-1";
-const DATEIEN = ["./", "index.html", "style.css", "app.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
+const VERSION = "reselling-2";
+const DATEIEN = ["./", "index.html", "style.css", "app.js", "fotos.html", "fotos.css", "fotos.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(DATEIEN)).then(() => self.skipWaiting()));

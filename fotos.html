@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Foto-Studio – Mein Reselling</title>
+  <meta name="theme-color" content="#0E1113">
+  <meta name="color-scheme" content="dark">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171C1F'/%3E%3Cpath d='M9 17l5 5 9-12' stroke='%2346C08E' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="fotos.css">
+</head>
+<body class="studio">
+  <header class="kopf">
+    <div class="breite">
+      <div class="marke-name">
+        <a class="zurueck" href="./" aria-label="Zurück zu Mein Reselling">←</a>
+        <h1>Foto-Studio</h1>
+      </div>
+      <label class="knopf knopf-hell" for="fotos-datei">+ Fotos</label>
+    </div>
+  </header>
+
+  <main class="breite">
+    <input type="file" id="fotos-datei" accept="image/*" multiple hidden>
+
+    <!-- Start: noch keine Fotos -->
+    <section class="ablage" id="ablage">
+      <label class="ablage-feld" for="fotos-datei">
+        <span class="ablage-plus" aria-hidden="true">+</span>
+        <strong>Fotos auswählen</strong>
+        <span>oder hierher ziehen · am Handy auch mit der Kamera</span>
+      </label>
+      <ul class="ablage-liste">
+        <li>Alle Fotos bekommen dasselbe Format.</li>
+        <li>Jedes Foto wird automatisch gleich hell gemacht.</li>
+        <li>Deine Fotos bleiben auf deinem Gerät, nichts wird hochgeladen.</li>
+      </ul>
+    </section>
+
+    <!-- Bearbeiten -->
+    <section class="werkbank" id="werkbank" hidden>
+      <div class="regler-feld">
+        <div class="gruppe">
+          <span class="gruppe-name" id="format-name">Format</span>
+          <div class="formate" role="radiogroup" aria-labelledby="format-name">
+            <button type="button" role="radio" aria-checked="true" data-format="1">Quadrat 1:1</button>
+            <button type="button" role="radio" aria-checked="false" data-format="0.8">Hoch 4:5</button>
+            <button type="button" role="radio" aria-checked="false" data-format="0.75">Hoch 3:4</button>
+          </div>
+        </div>
+
+        <label class="schalter">
+          <input type="checkbox" id="auto" checked>
+          <span>Automatisch aufhellen <small>(macht alle Fotos gleich hell)</small></span>
+        </label>
+
+        <div class="regler">
+          <label for="r-hell">Helligkeit <output id="o-hell">0</output></label>
+          <input type="range" id="r-hell" min="-40" max="40" value="0" step="1">
+          <label for="r-kontrast">Kontrast <output id="o-kontrast">0</output></label>
+          <input type="range" id="r-kontrast" min="-30" max="40" value="0" step="1">
+          <label for="r-farbe">Farbe <output id="o-farbe">0</output></label>
+          <input type="range" id="r-farbe" min="-50" max="50" value="0" step="1">
+          <label for="r-waerme">Wärme <output id="o-waerme">0</output></label>
+          <input type="range" id="r-waerme" min="-30" max="30" value="0" step="1">
+        </div>
+
+        <div class="regler-knoepfe">
+          <button class="knopf knopf-klein" type="button" id="zuruecksetzen">Regler zurücksetzen</button>
+          <button class="knopf knopf-klein" type="button" id="vorher" aria-pressed="false">Original zeigen</button>
+        </div>
+      </div>
+
+      <div class="ergebnis-feld">
+        <p class="tipp">Ausschnitt verschieben: Foto mit dem Finger oder der Maus ziehen.</p>
+        <ul class="bilder" id="bilder"></ul>
+        <div class="speichern-leiste">
+          <button class="knopf knopf-hell" type="button" id="alle-speichern">Alle speichern</button>
+          <button class="knopf" type="button" id="teilen" hidden>Teilen / in Galerie</button>
+          <button class="knopf knopf-rot" type="button" id="alle-weg">Alle entfernen</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  <script src="fotos.js"></script>
+</body>
+</html>

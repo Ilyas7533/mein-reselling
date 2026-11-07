@@ -1,0 +1,54 @@
+/* Foto-Studio – baut auf style.css auf */
+.zurueck { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--linie); background: var(--flaeche-2); color: var(--tinte); text-decoration: none; font-size: 18px; }
+.zurueck:hover { background: #242A2F; }
+.kopf label.knopf { cursor: pointer; }
+
+/* Start */
+.ablage { margin-top: 24px; display: grid; gap: 16px; }
+.ablage-feld {
+  display: grid; place-items: center; gap: 6px; text-align: center; padding: 56px 20px; cursor: pointer;
+  border: 1.5px dashed #3A4249; border-radius: 18px; background: var(--flaeche); transition: border-color .15s, background-color .15s;
+}
+.ablage-feld:hover, .ablage.ueber .ablage-feld { border-color: var(--plus); background: #12201A; }
+.ablage-plus { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--hell); color: #0E1113; font-size: 30px; margin-bottom: 8px; }
+.ablage-feld strong { font-size: 19px; }
+.ablage-feld span:last-child { color: var(--leise); font-weight: 400; font-size: 14.5px; }
+.ablage-liste { margin: 0; padding: 0 0 0 20px; color: var(--leise); font-size: 14.5px; display: grid; gap: 4px; }
+
+/* Werkbank: links Regler, rechts Fotos */
+.werkbank:not([hidden]) { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; margin-top: 24px; }
+.regler-feld { position: sticky; top: 84px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund); padding: 18px; display: grid; gap: 18px; }
+.gruppe { display: grid; gap: 8px; }
+.gruppe-name { font-weight: 600; font-size: 14.5px; }
+.formate { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.formate button { min-height: 40px; border-radius: 9px; border: 1px solid var(--linie); background: var(--flaeche-2); color: var(--leise); font-weight: 600; font-size: 13px; cursor: pointer; }
+.formate button[aria-checked="true"] { background: var(--hell); border-color: var(--hell); color: #0E1113; }
+.schalter { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-weight: 600; }
+.schalter input { width: 20px; height: 20px; min-height: 0; margin: 2px 0 0; padding: 0; flex: none; accent-color: var(--plus); }
+.schalter small { display: block; font-weight: 400; }
+.regler { display: grid; gap: 4px 0; }
+.regler label { display: flex; justify-content: space-between; font-size: 14px; margin-top: 8px; }
+.regler output { color: var(--leise); font-variant-numeric: tabular-nums; font-weight: 400; }
+.regler input[type="range"] { width: 100%; min-height: 28px; padding: 0; border: 0; background: transparent; box-shadow: none; accent-color: var(--hell); }
+.regler-knoepfe { display: flex; gap: 8px; flex-wrap: wrap; }
+.regler-knoepfe .knopf[aria-pressed="true"] { background: var(--hell); color: #0E1113; border-color: var(--hell); }
+
+.tipp { margin: 0 0 10px; color: var(--leise); font-size: 14px; }
+.bilder { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.bild { background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--rund); padding: 8px; display: grid; gap: 8px; }
+.bild canvas { width: 100%; height: auto; display: block; border-radius: 9px; background: #0F1215; cursor: grab; touch-action: none; }
+.bild canvas:active { cursor: grabbing; }
+.bild-knoepfe { display: flex; gap: 6px; }
+.bild-knoepfe .knopf { flex: 1; }
+.bild-knoepfe .knopf-rot { flex: none; width: 36px; padding: 0; }
+.speichern-leiste { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+@media (max-width: 760px) {
+  .werkbank:not([hidden]) { grid-template-columns: 1fr; }
+  .regler-feld { position: static; }
+  .bilder { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .bild { padding: 6px; }
+  .speichern-leiste { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); background: rgba(14, 17, 19, .94); backdrop-filter: blur(10px); padding: 10px; border: 1px solid var(--linie); border-radius: var(--rund); }
+  .speichern-leiste .knopf { flex: 1; }
+  .studio .fuss { padding-bottom: 24px; }
+}
