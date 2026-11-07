@@ -473,11 +473,12 @@ $("#zurueck-lager").addEventListener("click", () => {
 });
 
 $$("[data-schliessen]").forEach((k) => k.addEventListener("click", () => k.closest("dialog").close()));
-$("[data-neu]").addEventListener("click", () => oeffneArtikel());
+$$("[data-neu]").forEach((k) => k.addEventListener("click", () => oeffneArtikel()));
 
 // ---------- Reiter ----------
 const reiter = $$('[role="tab"]');
 function zeigeReiter(knopf) {
+  document.body.dataset.reiter = knopf.id; // z. B. damit der runde +-Knopf im Preisrechner verschwindet
   reiter.forEach((r) => {
     const an = r === knopf;
     r.setAttribute("aria-selected", String(an));
@@ -601,3 +602,8 @@ function meldung(text) {
 zeigeReiter($("#r-lager"));
 zeichnen();
 rechnen();
+
+// Offline-Speicher für die App-Dateien (geht nur, wenn die App online liegt, nicht beim Öffnen per Doppelklick)
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}

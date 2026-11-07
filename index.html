@@ -6,6 +6,11 @@
   <title>Mein Reselling</title>
   <meta name="theme-color" content="#0E1113">
   <meta name="color-scheme" content="dark">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Reselling">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171C1F'/%3E%3Cpath d='M9 17l5 5 9-12' stroke='%2346C08E' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -16,7 +21,7 @@
         <span class="logo" aria-hidden="true"></span>
         <h1>Mein Reselling</h1>
       </div>
-      <button class="knopf knopf-hell" type="button" data-neu>+ Artikel</button>
+      <button class="knopf knopf-hell kopf-neu" type="button" data-neu>+ Artikel</button>
     </div>
   </header>
 
@@ -182,6 +187,9 @@
       </div>
     </form>
   </dialog>
+
+  <!-- runder Knopf unten rechts, nur am Handy sichtbar -->
+  <button class="schwebe-knopf" type="button" data-neu aria-label="Artikel hinzufügen">+</button>
 
   <p class="toast" id="toast" role="status" aria-live="polite"></p>
   <script src="app.js"></script>

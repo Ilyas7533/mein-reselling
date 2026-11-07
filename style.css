@@ -171,8 +171,44 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.8); }
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); margin: 0; padding: 12px 18px; border-radius: 10px; background: var(--hell); color: #0E1113; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
 .toast.zeigen { opacity: 1; transform: translate(-50%, 0); }
 
+/* Runder Knopf: nur am Handy */
+.schwebe-knopf { display: none; }
+
 /* Handy */
 @media (max-width: 720px) {
+  /* Leiste mit den Bereichen unten am Daumen, + als runder Knopf darüber */
+  .kopf-neu { display: none; }
+  .reiter {
+    position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 6;
+    margin: 0; padding: 5px; background: rgba(22, 26, 29, .94); backdrop-filter: blur(12px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .55);
+  }
+  .reiter button { min-height: 46px; }
+  .schwebe-knopf {
+    display: grid; place-items: center; position: fixed; right: 16px; z-index: 7;
+    bottom: calc(86px + env(safe-area-inset-bottom)); width: 58px; height: 58px; border-radius: 50%;
+    border: 0; background: var(--hell); color: #0E1113; font-size: 32px; font-weight: 400; line-height: 1; cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .55); transition: transform .12s ease;
+  }
+  .schwebe-knopf:active { transform: scale(.94); }
+  body[data-reiter="r-rechner"] .schwebe-knopf { display: none; }
+  .fuss { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
+  /* Meldungen oben, damit sie nichts in der Liste verdecken */
+  .toast { bottom: auto; top: calc(74px + env(safe-area-inset-top)); transform: translate(-50%, -12px); }
+  .toast.zeigen { transform: translate(-50%, 0); }
+  /* Preisrechner: Ergebnis zuerst, Eingaben darunter */
+  .ergebnis { order: -1; padding: 16px 18px; gap: 10px; grid-template-columns: 1fr 1fr; }
+  .ergebnis strong { font-size: 30px; }
+  .ergebnis p { grid-column: 1 / -1; padding-top: 10px; font-size: 13px; }
+  /* Fenster fahren von unten hoch und nutzen die ganze Breite */
+  .fenster {
+    width: 100%; max-width: none; max-height: 92dvh; margin: auto 0 0; border-radius: 18px 18px 0 0;
+    border-bottom: 0; animation: hoch .22s ease-out;
+  }
+  .fenster form { padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); }
+  .fenster-knoepfe .knopf { flex: 1; }
+  .fenster-knoepfe .platz { display: none; }
+
   .zahlen { grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
   .zahl-gross { grid-column: 1 / -1; }
   .zahl { padding: 12px; }
@@ -188,6 +224,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.8); }
   .foto { width: 60px; height: 60px; }
   .aktionen .knopf { flex: 1; }
 }
+@keyframes hoch { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
 }
