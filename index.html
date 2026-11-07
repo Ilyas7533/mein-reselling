@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mein Reselling</title>
+  <meta name="theme-color" content="#123B33">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23123B33'/%3E%3Cpath d='M9 17l5 5 9-12' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="kopf">
+    <div class="breite">
+      <h1>Mein Reselling</h1>
+      <button class="knopf knopf-voll" type="button" data-neu>+ Artikel</button>
+    </div>
+  </header>
+
+  <main class="breite">
+    <!-- Kennzahlen -->
+    <section class="zahlen" aria-label="Übersicht">
+      <div class="zahl zahl-gross">
+        <span class="zahl-name">Gewinn diesen Monat</span>
+        <strong id="z-monat">0 €</strong>
+      </div>
+      <div class="zahl">
+        <span class="zahl-name">Gewinn insgesamt</span>
+        <strong id="z-gesamt">0 €</strong>
+      </div>
+      <div class="zahl">
+        <span class="zahl-name">Im Lager</span>
+        <strong id="z-lager">0</strong>
+        <small id="z-lagerwert">für 0 € eingekauft</small>
+      </div>
+      <div class="zahl">
+        <span class="zahl-name">Verkauft</span>
+        <strong id="z-verkauft">0</strong>
+        <small id="z-umsatz">0 € Umsatz</small>
+      </div>
+    </section>
+
+    <!-- Reiter -->
+    <nav class="reiter" role="tablist" aria-label="Bereiche">
+      <button role="tab" type="button" aria-selected="true" aria-controls="t-lager" id="r-lager">Lager</button>
+      <button role="tab" type="button" aria-selected="false" aria-controls="t-verkauft" id="r-verkauft">Verkauft</button>
+      <button role="tab" type="button" aria-selected="false" aria-controls="t-rechner" id="r-rechner">Preisrechner</button>
+    </nav>
+
+    <!-- Lager -->
+    <section class="tafel" role="tabpanel" id="t-lager" aria-labelledby="r-lager">
+      <div class="werkzeug">
+        <input type="search" id="suche-lager" placeholder="Im Lager suchen …" aria-label="Im Lager suchen">
+        <select id="sort-lager" aria-label="Sortierung">
+          <option value="alt">Am längsten im Lager zuerst</option>
+          <option value="neu">Neueste zuerst</option>
+          <option value="name">Nach Name</option>
+        </select>
+      </div>
+      <ul class="liste" id="liste-lager"></ul>
+      <p class="leer" id="leer-lager" hidden>Noch nichts im Lager. Tippe oben auf <b>+ Artikel</b>.</p>
+    </section>
+
+    <!-- Verkauft -->
+    <section class="tafel" role="tabpanel" id="t-verkauft" aria-labelledby="r-verkauft" hidden>
+      <div class="werkzeug">
+        <input type="search" id="suche-verkauft" placeholder="In Verkäufen suchen …" aria-label="In Verkäufen suchen">
+        <select id="monat-verkauft" aria-label="Monat"></select>
+      </div>
+      <p class="summe" id="summe-verkauft"></p>
+      <ul class="liste" id="liste-verkauft"></ul>
+      <p class="leer" id="leer-verkauft" hidden>In diesem Zeitraum wurde noch nichts verkauft.</p>
+    </section>
+
+    <!-- Preisrechner -->
+    <section class="tafel" role="tabpanel" id="t-rechner" aria-labelledby="r-rechner" hidden>
+      <form class="rechner" id="rechner" autocomplete="off">
+        <label>Einkaufspreis
+          <span class="euro"><input id="p-einkauf" inputmode="decimal" placeholder="0,00"></span>
+        </label>
+        <label>Sonstige Kosten <small>(z. B. Reinigung, Verpackung)</small>
+          <span class="euro"><input id="p-kosten" inputmode="decimal" placeholder="0,00"></span>
+        </label>
+        <label>Wunschgewinn
+          <span class="euro"><input id="p-wunsch" inputmode="decimal" placeholder="10,00"></span>
+        </label>
+        <label>Mindestgewinn <small>(darunter verkaufst du nicht)</small>
+          <span class="euro"><input id="p-mindest" inputmode="decimal" placeholder="5,00"></span>
+        </label>
+      </form>
+      <div class="ergebnis" aria-live="polite">
+        <div>
+          <span>Preis ansetzen</span>
+          <strong id="p-ansetzen">–</strong>
+        </div>
+        <div>
+          <span>Bei Preisvorschlägen nicht unter</span>
+          <strong id="p-unter">–</strong>
+        </div>
+        <p id="p-hinweis">Auf Vinted zahlt der Käufer Versand und Käuferschutz. Du bekommst den Preis, den du ansetzt.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fuss breite">
+    <p>Deine Daten bleiben nur auf diesem Gerät, in diesem Browser.</p>
+    <div class="fuss-knoepfe">
+      <button class="knopf" type="button" id="sichern">Daten sichern</button>
+      <label class="knopf" for="laden">Daten laden</label>
+      <input type="file" id="laden" accept="application/json,.json" hidden>
+    </div>
+  </footer>
+
+  <!-- Fenster: Artikel anlegen / bearbeiten -->
+  <dialog class="fenster" id="f-artikel" aria-labelledby="f-artikel-titel">
+    <form method="dialog" id="form-artikel" autocomplete="off">
+      <h2 id="f-artikel-titel">Neuer Artikel</h2>
+      <label>Was ist es? *
+        <input name="name" required maxlength="80" placeholder="z. B. Nike Hoodie grau">
+      </label>
+      <div class="zwei">
+        <label>Marke
+          <input name="marke" maxlength="40">
+        </label>
+        <label>Größe
+          <input name="groesse" maxlength="20">
+        </label>
+      </div>
+      <div class="zwei">
+        <label>Einkaufspreis *
+          <span class="euro"><input name="einkauf" required inputmode="decimal" placeholder="0,00"></span>
+        </label>
+        <label>Gekauft am
+          <input name="kaufdatum" type="date">
+        </label>
+      </div>
+      <label>Sonstige Kosten <small>(Reinigung, Verpackung …)</small>
+        <span class="euro"><input name="kosten" inputmode="decimal" placeholder="0,00"></span>
+      </label>
+      <label>Notiz
+        <textarea name="notiz" rows="2" maxlength="300"></textarea>
+      </label>
+      <p class="fehler" id="fehler-artikel" role="alert" hidden></p>
+      <div class="fenster-knoepfe">
+        <button class="knopf knopf-rot" type="button" id="loeschen" hidden>Löschen</button>
+        <span class="platz"></span>
+        <button class="knopf" type="button" data-schliessen>Abbrechen</button>
+        <button class="knopf knopf-voll" type="submit" value="ok">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Fenster: verkauft -->
+  <dialog class="fenster" id="f-verkauf" aria-labelledby="f-verkauf-titel">
+    <form method="dialog" id="form-verkauf" autocomplete="off">
+      <h2 id="f-verkauf-titel">Verkauft</h2>
+      <p class="fenster-unter" id="verkauf-name"></p>
+      <div class="zwei">
+        <label>Verkaufspreis *
+          <span class="euro"><input name="verkauf" required inputmode="decimal" placeholder="0,00"></span>
+        </label>
+        <label>Verkauft am
+          <input name="verkaufsdatum" type="date">
+        </label>
+      </div>
+      <label>Deine Versandkosten <small>(meist 0 – zahlt der Käufer)</small>
+        <span class="euro"><input name="versand" inputmode="decimal" placeholder="0,00"></span>
+      </label>
+      <p class="vorschau" id="verkauf-gewinn" aria-live="polite"></p>
+      <p class="fehler" id="fehler-verkauf" role="alert" hidden></p>
+      <div class="fenster-knoepfe">
+        <button class="knopf" type="button" id="zurueck-lager" hidden>Zurück ins Lager</button>
+        <span class="platz"></span>
+        <button class="knopf" type="button" data-schliessen>Abbrechen</button>
+        <button class="knopf knopf-voll" type="submit" value="ok">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+/* Mein Reselling – Gestaltung */
+:root {
+  --grund: #F4F5F2;
+  --flaeche: #FFFFFF;
+  --tinte: #16201D;
+  --leise: #5B6762;
+  --linie: #E1E5E0;
+  --akzent: #123B33;
+  --akzent-hell: #E3EFEB;
+  --plus: #127A4B;
+  --minus: #B42318;
+  --rund: 14px;
+  --schatten: 0 1px 2px rgba(22, 32, 29, .06), 0 8px 24px -12px rgba(22, 32, 29, .18);
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--grund);
+  color: var(--tinte);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid #2F7DF6; outline-offset: 2px; }
+.breite { width: 100%; max-width: 980px; margin: 0 auto; padding: 0 16px; }
+
+/* Kopf */
+.kopf { position: sticky; top: 0; z-index: 5; background: var(--akzent); color: #fff; padding-top: env(safe-area-inset-top); }
+.kopf .breite { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.kopf h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+.kopf .knopf-voll { background: #fff; color: var(--akzent); border-color: #fff; }
+
+/* Knöpfe */
+.knopf {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 44px; padding: 0 18px; border-radius: 999px;
+  border: 1.5px solid var(--linie); background: var(--flaeche);
+  font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none;
+  transition: transform .12s ease, background-color .15s ease;
+}
+.knopf:active { transform: scale(.97); }
+.knopf:hover { background: #F8F9F7; }
+.knopf-voll { background: var(--akzent); border-color: var(--akzent); color: #fff; }
+.knopf-voll:hover { background: #18493F; }
+.knopf-rot { color: var(--minus); border-color: #F1C9C5; }
+.knopf-klein { min-height: 38px; padding: 0 14px; font-size: 14px; }
+
+/* Kennzahlen */
+.zahlen { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
+.zahl { background: var(--flaeche); border-radius: var(--rund); padding: 16px; box-shadow: var(--schatten); display: flex; flex-direction: column; gap: 2px; }
+.zahl-name { font-size: 14px; color: var(--leise); }
+.zahl strong { font-size: 26px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.zahl small { color: var(--leise); font-size: 13px; }
+.zahl-gross { background: var(--akzent); color: #fff; }
+.zahl-gross .zahl-name { color: #B9D3CB; }
+.zahl-gross strong { font-size: 34px; }
+
+/* Reiter */
+.reiter { display: flex; gap: 6px; background: #E6E9E4; padding: 5px; border-radius: 999px; margin-bottom: 16px; }
+.reiter button { flex: 1; min-height: 42px; border: 0; border-radius: 999px; background: transparent; font-weight: 600; color: var(--leise); cursor: pointer; }
+.reiter button[aria-selected="true"] { background: var(--flaeche); color: var(--tinte); box-shadow: 0 1px 3px rgba(22, 32, 29, .12); }
+
+/* Werkzeugleiste */
+.werkzeug { display: flex; gap: 10px; margin-bottom: 12px; }
+.werkzeug input, .werkzeug select { min-height: 44px; border: 1.5px solid var(--linie); border-radius: 12px; background: var(--flaeche); padding: 0 12px; }
+.werkzeug input { flex: 1; min-width: 0; }
+.werkzeug select { width: auto; flex: none; }
+
+/* Listen */
+.liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.eintrag { background: var(--flaeche); border-radius: var(--rund); padding: 14px 16px; box-shadow: var(--schatten); display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center; }
+.eintrag h3 { margin: 0; font-size: 17px; }
+.eintrag .info { color: var(--leise); font-size: 14px; }
+.eintrag .betrag { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.eintrag .aktionen { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.marke { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--akzent-hell); color: var(--akzent); }
+.marke-alt { background: #FDF0D5; color: #8A5300; }
+.marke-sehr-alt { background: #FDE3E0; color: var(--minus); }
+.plus { color: var(--plus); }
+.minus { color: var(--minus); }
+.summe { margin: 0 0 12px; color: var(--leise); }
+.summe b { color: var(--tinte); }
+.leer { text-align: center; color: var(--leise); padding: 40px 16px; background: var(--flaeche); border-radius: var(--rund); }
+
+/* Preisrechner */
+.tafel[hidden] { display: none; }
+#t-rechner:not([hidden]) { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.rechner { background: var(--flaeche); border-radius: var(--rund); padding: 18px; box-shadow: var(--schatten); display: grid; gap: 14px; }
+.ergebnis { background: var(--akzent); color: #fff; border-radius: var(--rund); padding: 20px; display: grid; gap: 16px; }
+.ergebnis div { display: flex; flex-direction: column; }
+.ergebnis span { color: #B9D3CB; font-size: 15px; }
+.ergebnis strong { font-size: 40px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.ergebnis p { margin: 0; font-size: 14px; color: #CFE1DB; }
+
+/* Formulare */
+label { display: grid; gap: 6px; font-weight: 600; font-size: 15px; }
+label small { font-weight: 400; color: var(--leise); }
+input:not([type="file"]), select, textarea { width: 100%; min-height: 44px; border: 1.5px solid var(--linie); border-radius: 12px; background: #fff; padding: 10px 12px; font-weight: 400; }
+textarea { resize: vertical; }
+input:focus, select:focus, textarea:focus { border-color: var(--akzent); outline: none; box-shadow: 0 0 0 3px var(--akzent-hell); }
+.euro { position: relative; display: block; }
+.euro input { padding-right: 34px; }
+.euro::after { content: "€"; position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--leise); font-weight: 400; pointer-events: none; }
+.zwei { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fehler { margin: 0; color: var(--minus); font-weight: 600; }
+
+/* Fenster */
+.fenster { width: min(520px, calc(100% - 24px)); border: 0; border-radius: 18px; padding: 0; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .45); }
+.fenster::backdrop { background: rgba(10, 20, 17, .45); }
+.fenster form { padding: 22px; display: grid; gap: 14px; }
+.fenster h2 { margin: 0; font-size: 21px; }
+.fenster-unter { margin: -8px 0 0; color: var(--leise); }
+.fenster-knoepfe { display: flex; gap: 8px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+.platz { flex: 1; }
+.vorschau { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--akzent-hell); font-weight: 600; }
+.vorschau:empty { display: none; }
+
+/* Fuß */
+.fuss { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 32px; padding-top: 16px; padding-bottom: calc(32px + env(safe-area-inset-bottom)); color: var(--leise); font-size: 14px; }
+.fuss p { margin: 0; }
+.fuss-knoepfe { display: flex; gap: 8px; }
+
+/* Meldung unten */
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); margin: 0; padding: 12px 18px; border-radius: 999px; background: var(--tinte); color: #fff; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.toast.zeigen { opacity: 1; transform: translate(-50%, 0); }
+
+/* Handy */
+@media (max-width: 720px) {
+  .zahlen { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .zahl-gross { grid-column: 1 / -1; }
+  .zahl { padding: 12px; }
+  .zahl-name { font-size: 13px; }
+  .zahl strong { font-size: 19px; }
+  .zahl small { font-size: 12px; }
+  .zahl-gross strong { font-size: 32px; }
+  #t-rechner:not([hidden]) { grid-template-columns: 1fr; }
+  .werkzeug { flex-direction: column; }
+  .werkzeug select { width: 100%; }
+  .zwei { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
