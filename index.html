@@ -120,13 +120,11 @@
       <h2 id="f-artikel-titel">Neuer Artikel</h2>
 
       <div class="foto-feld">
-        <div class="foto-vorschau" id="foto-vorschau" aria-hidden="true"><span>Kein Foto</span></div>
-        <div class="foto-knoepfe">
-          <label class="knopf knopf-klein" for="foto-datei" id="foto-waehlen">Foto hinzufügen</label>
-          <input type="file" id="foto-datei" accept="image/*" hidden>
-          <button class="knopf knopf-klein knopf-leise" type="button" id="foto-entfernen" hidden>Foto entfernen</button>
-          <small>Am Handy kannst du direkt die Kamera nehmen.</small>
+        <span class="foto-titel">Fotos <small id="foto-hinweis">Das erste Foto erscheint in der Liste.</small></span>
+        <div class="foto-reihe" id="foto-reihe">
+          <label class="foto-plus" for="foto-datei" id="foto-waehlen"><span aria-hidden="true">+</span>Foto</label>
         </div>
+        <input type="file" id="foto-datei" accept="image/*" multiple hidden>
       </div>
 
       <label>Was ist es? *

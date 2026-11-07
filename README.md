@@ -6,7 +6,7 @@ Kleine App für Vinted-Reselling: Lager, Verkäufe, Gewinn und ein Preisrechner.
 
 `index.html` doppelt anklicken – die App öffnet sich im Browser. Es braucht kein Internet und keine Installation.
 
-- **+ Artikel**: Teil ins Lager legen (Foto, Einkaufspreis, Marke, Größe, Notiz). Ein Datum muss man nicht eintragen: Kauf- und Verkaufstag merkt sich die App automatisch (für „seit … Tagen“ und „Gewinn diesen Monat“).
+- **+ Artikel**: Teil ins Lager legen (bis zu 8 Fotos – das erste ist das Titelbild in der Liste, Antippen eines anderen Fotos macht es zum Titelbild –, Einkaufspreis, Marke, Größe, Notiz). Ein Datum muss man nicht eintragen: Kauf- und Verkaufstag merkt sich die App automatisch (für „seit … Tagen“ und „Gewinn diesen Monat“).
 - **Verkauft**: Verkaufspreis eintragen – der Gewinn wird automatisch ausgerechnet.
 - **Preis berechnen**: übernimmt den Einkaufspreis in den Preisrechner.
 - **Preisrechner**: Wunschgewinn und Mindestgewinn eingeben → Preis zum Ansetzen und die Grenze für Preisvorschläge (auf volle Euro aufgerundet).

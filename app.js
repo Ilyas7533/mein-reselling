@@ -48,17 +48,23 @@ async function fotoAktion(modus, aktion) {
     tx.onerror = () => nein(tx.error);
   });
 }
-const fotoSpeichern = (id, blob) => fotoAktion("readwrite", (s) => s.put(blob, id));
-const fotoLaden = (id) => fotoAktion("readonly", (s) => s.get(id));
+// Pro Artikel wird eine Liste von Fotos gespeichert; das erste ist das Titelbild.
+const MAX_FOTOS = 8;
+const fotosSpeichern = (id, blobs) => fotoAktion("readwrite", (s) => s.put(blobs, id));
+// Ältere Einträge haben nur ein einzelnes Foto statt einer Liste – beides wird als Liste zurückgegeben
+const fotosLaden = async (id) => {
+  const wert = await fotoAktion("readonly", (s) => s.get(id));
+  return Array.isArray(wert) ? wert : wert ? [wert] : [];
+};
 const fotoLoeschen = (id) => fotoAktion("readwrite", (s) => s.delete(id));
 const alleFotosLoeschen = () => fotoAktion("readwrite", (s) => s.clear());
 
-// Bereits geladene Fotos merken, damit die Liste nicht bei jedem Zeichnen neu lädt
+// Titelbilder für die Liste merken, damit sie nicht bei jedem Zeichnen neu geladen werden
 const fotoAdressen = new Map();
 async function fotoAdresse(id) {
   if (!fotoAdressen.has(id)) {
-    const blob = await fotoLaden(id).catch(() => null);
-    fotoAdressen.set(id, blob ? URL.createObjectURL(blob) : null);
+    const [titelbild] = await fotosLaden(id).catch(() => []);
+    fotoAdressen.set(id, titelbild ? URL.createObjectURL(titelbild) : null);
   }
   return fotoAdressen.get(id);
 }
@@ -85,7 +91,9 @@ function fotoKachel(a) {
   const kachel = el("div", { class: "foto" }, el("span", { text: (a.name || "?").trim().charAt(0).toUpperCase() }));
   if (a.foto) {
     fotoAdresse(a.id).then((adresse) => {
-      if (adresse) kachel.replaceChildren(el("img", { src: adresse, alt: "" }));
+      if (!adresse) return;
+      kachel.replaceChildren(el("img", { src: adresse, alt: "" }));
+      if (a.fotoAnzahl > 1) kachel.append(el("span", { class: "anzahl", text: a.fotoAnzahl, title: `${a.fotoAnzahl} Fotos` }));
     });
   }
   return kachel;
@@ -251,41 +259,74 @@ function zeichneVerkauft() {
 // ---------- Fenster: Artikel ----------
 const fArtikel = $("#f-artikel");
 const formArtikel = $("#form-artikel");
-let neuesFoto; // undefined = unverändert, null = entfernt, Blob = neues Foto
-let vorschauAdresse = null;
+// Fotos, die gerade im Fenster zu sehen sind: [{ blob, adresse }]; das erste ist das Titelbild
+let fensterFotos = [];
+let fotosGeaendert = false;
 
-function zeigeFotoVorschau(adresse) {
-  if (vorschauAdresse && vorschauAdresse !== adresse && !fotoAdressenWerte().includes(vorschauAdresse)) URL.revokeObjectURL(vorschauAdresse);
-  vorschauAdresse = adresse;
-  $("#foto-vorschau").replaceChildren(adresse ? el("img", { src: adresse, alt: "" }) : el("span", { text: "Kein Foto" }));
-  $("#foto-entfernen").hidden = !adresse;
-  $("#foto-waehlen").textContent = adresse ? "Foto ändern" : "Foto hinzufügen";
+function fensterFotosLeeren() {
+  fensterFotos.forEach((f) => URL.revokeObjectURL(f.adresse));
+  fensterFotos = [];
 }
-const fotoAdressenWerte = () => [...fotoAdressen.values()];
+
+function zeichneFensterFotos() {
+  const reihe = $("#foto-reihe");
+  const plus = $("#foto-waehlen");
+  reihe.replaceChildren(...fensterFotos.map((f, i) => el("div", { class: `foto-teil${i === 0 ? " titelbild" : ""}`, role: "button", tabindex: "0",
+    "aria-label": i === 0 ? `Foto ${i + 1}, Titelbild` : `Foto ${i + 1} als Titelbild nehmen`,
+    onclick: () => alsTitelbild(i),
+    onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); alsTitelbild(i); } } },
+    el("img", { src: f.adresse, alt: "" }),
+    i === 0 ? el("span", { class: "titel-marke", text: "Titelbild" }) : null,
+    el("button", { class: "foto-weg", type: "button", "aria-label": `Foto ${i + 1} entfernen`, text: "×",
+      onclick: (e) => { e.stopPropagation(); fotoEntfernen(i); } }),
+  )), plus);
+  plus.hidden = fensterFotos.length >= MAX_FOTOS;
+  $("#foto-hinweis").textContent = fensterFotos.length > 1
+    ? "Tippe auf ein Foto, um es zum Titelbild zu machen."
+    : "Das erste Foto erscheint in der Liste.";
+}
+
+function alsTitelbild(i) {
+  if (i === 0) return;
+  fensterFotos.unshift(...fensterFotos.splice(i, 1));
+  fotosGeaendert = true;
+  zeichneFensterFotos();
+}
+function fotoEntfernen(i) {
+  const [weg] = fensterFotos.splice(i, 1);
+  URL.revokeObjectURL(weg.adresse);
+  fotosGeaendert = true;
+  zeichneFensterFotos();
+}
 
 $("#foto-datei").addEventListener("change", async (e) => {
-  const datei = e.target.files[0];
+  const dateien = [...e.target.files].slice(0, MAX_FOTOS - fensterFotos.length);
   e.target.value = "";
-  if (!datei) return;
-  try {
-    neuesFoto = await verkleinern(datei);
-    zeigeFotoVorschau(URL.createObjectURL(neuesFoto));
-  } catch {
-    meldung("Dieses Foto kann nicht gelesen werden");
+  for (const datei of dateien) {
+    try {
+      const blob = await verkleinern(datei);
+      fensterFotos.push({ blob, adresse: URL.createObjectURL(blob) });
+      fotosGeaendert = true;
+    } catch {
+      meldung("Ein Foto konnte nicht gelesen werden");
+    }
   }
-});
-$("#foto-entfernen").addEventListener("click", () => {
-  neuesFoto = null;
-  zeigeFotoVorschau(null);
+  zeichneFensterFotos();
 });
 
 async function oeffneArtikel(id = null) {
   bearbeitenId = id;
-  neuesFoto = undefined;
   formArtikel.reset();
   $("#fehler-artikel").hidden = true;
   const a = artikel.find((x) => x.id === id);
-  zeigeFotoVorschau(a?.foto ? await fotoAdresse(a.id) : null);
+  fensterFotosLeeren();
+  fotosGeaendert = false;
+  zeichneFensterFotos(); // sofort leeren, damit keine Fotos vom vorherigen Artikel stehen bleiben
+  if (a?.foto) {
+    const blobs = await fotosLaden(a.id).catch(() => []);
+    fensterFotos = blobs.map((blob) => ({ blob, adresse: URL.createObjectURL(blob) }));
+  }
+  zeichneFensterFotos();
   $("#f-artikel-titel").textContent = a ? "Artikel bearbeiten" : "Neuer Artikel";
   $("#loeschen").hidden = !a;
   const f = formArtikel.elements;
@@ -327,19 +368,20 @@ formArtikel.addEventListener("submit", async (e) => {
   // Das Datum wird nicht angezeigt, aber gemerkt (für „seit … Tagen“ und die Sortierung)
   else artikel.push(ziel = { id: neueId(), status: "lager", kaufdatum: heute(), ...werte });
 
-  // Foto speichern oder entfernen
+  // Fotos speichern oder entfernen
   try {
-    if (neuesFoto) {
-      await fotoSpeichern(ziel.id, neuesFoto);
-      fotoVergessen(ziel.id);
+    if (fotosGeaendert && fensterFotos.length) {
+      await fotosSpeichern(ziel.id, fensterFotos.map((f) => f.blob));
       ziel.foto = true;
-    } else if (neuesFoto === null) {
+      ziel.fotoAnzahl = fensterFotos.length;
+    } else if (fotosGeaendert) {
       await fotoLoeschen(ziel.id);
-      fotoVergessen(ziel.id);
       delete ziel.foto;
+      delete ziel.fotoAnzahl;
     }
+    if (fotosGeaendert) fotoVergessen(ziel.id);
   } catch {
-    meldung("Das Foto konnte nicht gespeichert werden");
+    meldung("Die Fotos konnten nicht gespeichert werden");
   }
   speichern();
   fArtikel.close();
@@ -494,8 +536,8 @@ $("#sichern").addEventListener("click", async () => {
   // Fotos kommen als Text (data:image/jpeg;base64,…) mit in die Sicherung
   const mitFotos = await Promise.all(artikel.map(async (a) => {
     if (!a.foto) return a;
-    const blob = await fotoLaden(a.id).catch(() => null);
-    return blob ? { ...a, fotoDaten: await alsText(blob) } : a;
+    const blobs = await fotosLaden(a.id).catch(() => []);
+    return blobs.length ? { ...a, fotosDaten: await Promise.all(blobs.map(alsText)) } : a;
   }));
   const daten = JSON.stringify({ app: "mein-reselling", version: 2, gesichert: new Date().toISOString(), artikel: mitFotos }, null, 2);
   const link = el("a", { href: URL.createObjectURL(new Blob([daten], { type: "application/json" })), download: `reselling-sicherung-${heute()}.json` });
@@ -519,13 +561,20 @@ $("#laden").addEventListener("change", async (e) => {
     fotoAdressen.forEach((adresse) => adresse && URL.revokeObjectURL(adresse));
     fotoAdressen.clear();
     for (const a of liste) {
-      if (typeof a.fotoDaten === "string" && a.fotoDaten.startsWith("data:image/")) {
-        await fotoSpeichern(a.id, await (await fetch(a.fotoDaten)).blob());
+      // neue Sicherungen: fotosDaten (Liste), ältere: fotoDaten (ein Foto)
+      const texte = (Array.isArray(a.fotosDaten) ? a.fotosDaten : [a.fotoDaten])
+        .filter((t) => typeof t === "string" && t.startsWith("data:image/"))
+        .slice(0, MAX_FOTOS);
+      if (texte.length) {
+        await fotosSpeichern(a.id, await Promise.all(texte.map(async (t) => (await fetch(t)).blob())));
         a.foto = true;
+        a.fotoAnzahl = texte.length;
       } else {
         delete a.foto;
+        delete a.fotoAnzahl;
       }
       delete a.fotoDaten;
+      delete a.fotosDaten;
     }
     artikel = liste;
     speichern();
